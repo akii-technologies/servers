@@ -1,0 +1,8 @@
+{
+  "name": "lightrag",
+  "version": "0.1.0",
+  "description": "Lightweight Retrieval Augmented Generation for Supabase",
+  "main": "index.ts",
+  "types": "index.ts",
+  "private": true
+}
