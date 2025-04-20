@@ -67,7 +67,8 @@ jobs:
     needs: [create-metadata]
     if: ${{ needs.create-metadata.outputs.npm_packages != '[]' || needs.create-metadata.outputs.pypi_packages != '[]' }}
     runs-on: ubuntu-latest
-    environment: release
+    permissions:
+      contents: write
     outputs:
       changes_made: ${{ steps.commit.outputs.changes_made }}
     steps:
@@ -109,9 +110,9 @@ jobs:
       matrix:
         package: ${{ fromJson(needs.create-metadata.outputs.pypi_packages) }}
     name: Build ${{ matrix.package }}
-    environment: release
     permissions:
       id-token: write # Required for trusted publishing
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -150,8 +151,10 @@ jobs:
       matrix:
         package: ${{ fromJson(needs.create-metadata.outputs.npm_packages) }}
     name: Build ${{ matrix.package }}
-    environment: release
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -192,7 +195,6 @@ jobs:
     needs: [update-packages, create-metadata, publish-pypi, publish-npm]
     if: needs.update-packages.outputs.changes_made == 'true'
     runs-on: ubuntu-latest
-    environment: release
     permissions:
       contents: write
     steps:
@@ -215,7 +217,7 @@ jobs:
       - name: Docker MCP images
         uses: peter-evans/repository-dispatch@v3
         with:
-          token: ${{ secrets.DOCKER_TOKEN }}
+          token: ${{ github.token }}
           repository: docker/labs-ai-tools-for-devs
           event-type: build-mcp-images
           client-payload: '{"ref": "${{ needs.create-metadata.outputs.version }}"}'
