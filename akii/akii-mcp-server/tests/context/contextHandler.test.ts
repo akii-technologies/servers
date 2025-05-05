@@ -1,13 +1,13 @@
 import { handleContextRequest } from '../../src/context/contextHandler';
 import { formatPrompt, formatMessagesPrompt } from '../../src/context/formatters/promptFormatter';
 import { McpResponse } from '../../src/mcp';
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, jest } from '@jest/globals';
 
 // Mock the modules instead of trying to spy on actual implementations
-vi.mock('../../src/context/providers/lightrag', () => ({
-  LightRAGContextProvider: vi.fn().mockImplementation(() => ({
+jest.mock('../../src/context/providers/lightrag', () => ({
+  LightRAGContextProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'lightrag',
-    getContext: vi.fn().mockResolvedValue({
+    getContext: jest.fn().mockResolvedValue({
       context: 'This is the context from LightRAG',
       sources: [{ id: 'doc1', content: 'Content 1' }],
       tokenCount: 50
@@ -15,10 +15,10 @@ vi.mock('../../src/context/providers/lightrag', () => ({
   }))
 }));
 
-vi.mock('../../src/context/providers/brave', () => ({
-  BraveSearchProvider: vi.fn().mockImplementation(() => ({
+jest.mock('../../src/context/providers/brave', () => ({
+  BraveSearchProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'brave',
-    getContext: vi.fn().mockResolvedValue({
+    getContext: jest.fn().mockResolvedValue({
       context: 'Additional context from Brave',
       sources: [{ id: 'doc2', content: 'Content 2' }],
       tokenCount: 30
@@ -26,76 +26,76 @@ vi.mock('../../src/context/providers/brave', () => ({
   }))
 }));
 
-vi.mock('../../src/context/providers/knowledgeGraph', () => ({
-  KnowledgeGraphProvider: vi.fn().mockImplementation(() => ({
+jest.mock('../../src/context/providers/knowledgeGraph', () => ({
+  KnowledgeGraphProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'graph',
-    getContext: vi.fn().mockRejectedValue(new Error('Failed to get context'))
+    getContext: jest.fn().mockRejectedValue(new Error('Failed to get context'))
   }))
 }));
 
 // Mock other providers with empty implementations
-vi.mock('../../src/context/providers/mobile', () => ({
-  MobileContextProvider: vi.fn().mockImplementation(() => ({
+jest.mock('../../src/context/providers/mobile', () => ({
+  MobileContextProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'mobile',
-    getContext: vi.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
+    getContext: jest.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
   }))
 }));
 
 // Mock APIs providers
-vi.mock('../../src/context/providers/apis', () => ({
-  ShopifyApiProvider: vi.fn().mockImplementation(() => ({
+jest.mock('../../src/context/providers/apis', () => ({
+  ShopifyApiProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'shopify',
-    getContext: vi.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
+    getContext: jest.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
   })),
-  N8nApiProvider: vi.fn().mockImplementation(() => ({
+  N8nApiProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'n8n',
-    getContext: vi.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
+    getContext: jest.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
   })),
-  ZapierApiProvider: vi.fn().mockImplementation(() => ({
+  ZapierApiProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'zapier',
-    getContext: vi.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
+    getContext: jest.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
   })),
-  SlackApiProvider: vi.fn().mockImplementation(() => ({
+  SlackApiProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'slack',
-    getContext: vi.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
+    getContext: jest.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
   })),
-  WordPressApiProvider: vi.fn().mockImplementation(() => ({
+  WordPressApiProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'wordpress',
-    getContext: vi.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
+    getContext: jest.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
   }))
 }));
 
 // Mock messaging providers
-vi.mock('../../src/context/providers/messaging', () => ({
-  TelegramProvider: vi.fn().mockImplementation(() => ({
+jest.mock('../../src/context/providers/messaging', () => ({
+  TelegramProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'telegram',
-    getContext: vi.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
+    getContext: jest.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
   })),
-  WhatsAppProvider: vi.fn().mockImplementation(() => ({
+  WhatsAppProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'whatsapp',
-    getContext: vi.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
+    getContext: jest.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
   })),
-  FacebookMessengerProvider: vi.fn().mockImplementation(() => ({
+  FacebookMessengerProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'facebook',
-    getContext: vi.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
+    getContext: jest.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
   })),
-  InstagramProvider: vi.fn().mockImplementation(() => ({
+  InstagramProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'instagram',
-    getContext: vi.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
+    getContext: jest.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
   })),
-  WebChatProvider: vi.fn().mockImplementation(() => ({
+  WebChatProvider: jest.fn().mockImplementation(() => ({
     getName: () => 'webchat',
-    getContext: vi.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
+    getContext: jest.fn().mockResolvedValue({ context: '', sources: [], tokenCount: 0 })
   }))
 }));
 
 // Mock formatters
-vi.mock('../../src/context/formatters/promptFormatter', () => ({
-  formatPrompt: vi.fn().mockImplementation((query, context, options) => ({
+jest.mock('../../src/context/formatters/promptFormatter', () => ({
+  formatPrompt: jest.fn().mockImplementation((query, context, options) => ({
     formatted: `FORMATTED_PROMPT: ${query} | ${context} | ${options?.format || 'generic'}`,
     tokenCount: 100
   })),
-  formatMessagesPrompt: vi.fn().mockImplementation((query, context, systemPrompt) => 
+  formatMessagesPrompt: jest.fn().mockImplementation((query, context, systemPrompt) => 
     JSON.stringify([
       { role: 'system', content: systemPrompt || 'default' },
       { role: 'user', content: `FORMATTED_MESSAGE: ${query} | ${context}` }
@@ -114,7 +114,7 @@ vi.mock('../../src/context/formatters/promptFormatter', () => ({
 describe('contextHandler', () => {
   beforeEach(() => {
     // Reset all mocks
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('handleContextRequest', () => {
